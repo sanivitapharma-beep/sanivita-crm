@@ -6,7 +6,7 @@ import { Region, User, VisitReport, UserRole, Doctor, Pharmacy, ClientAlert, Sys
 import { exportToExcel, exportToPdf, exportUsersToExcel, exportMultipleRepClientsToExcel, exportClientsToExcel } from '../services/exportService';
 import { FilterIcon, DownloadIcon, CalendarIcon, DoctorIcon, PharmacyIcon, WarningIcon, UserIcon as UsersIcon, ChartBarIcon, CogIcon, CalendarPlusIcon, TrashIcon, MapPinIcon, CheckIcon, XIcon, UploadIcon, EditIcon, PlusIcon, UserGroupIcon, GraphIcon, EyeIcon, ReplyIcon } from './icons';
 import Modal from './Modal';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth_new';
 import { useLanguage, TranslationFunction } from '../hooks/useLanguage';
 import DataImport from './DataImport';
 import Spinner from './Spinner';

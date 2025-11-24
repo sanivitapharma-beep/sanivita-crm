@@ -2,7 +2,7 @@
 
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth_new';
 import { useLanguage } from '../hooks/useLanguage';
 import { api } from '../services/api';
 import { Doctor, Pharmacy, Product, VisitReport, Region, ClientAlert, SystemSettings, WeeklyPlan } from '../types';

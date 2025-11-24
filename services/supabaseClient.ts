@@ -1,15 +1,15 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-// CLEANUP: Remove legacy keys to prevent conflicts with the new static client
+// CLEANUP: Only remove legacy keys that might cause conflicts
 try {
   if (typeof window !== 'undefined') {
     const keysToRemove = [
       'sanivita-crm-supabase-url',
       'sanivita-crm-supabase-key',
       'sanivita-crm-supabaseUrl',
-      'sanivita-crm-supabaseAnonKey',
-      'supabase.auth.token'
+      'sanivita-crm-supabaseAnonKey'
+      // Note: We don't remove 'supabase.auth.token' as it's needed for session persistence
     ];
     keysToRemove.forEach(key => localStorage.removeItem(key));
   }

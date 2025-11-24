@@ -1,6 +1,7 @@
 
 import { supabase } from './supabaseClient';
 import { User, Region, Doctor, Pharmacy, Product, DoctorVisit, PharmacyVisit, VisitReport, Specialization, ClientAlert, SystemSettings, WeeklyPlan, UserRole } from '../types';
+import { cacheService, CacheKeys } from './cacheService';
 
 // Helper to handle Supabase errors
 const handleSupabaseError = (error: any, context: string) => {
@@ -70,6 +71,14 @@ export const api = {
   },
 
   getUserProfile: async (userId: string): Promise<User> => {
+    // Check cache first
+    const cacheKey = CacheKeys.USER_PROFILE(userId);
+    const cachedProfile = cacheService.get<User>(cacheKey);
+    
+    if (cachedProfile) {
+      return cachedProfile;
+    }
+    
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -90,7 +99,11 @@ export const api = {
       throw new Error('profile_not_found');
     }
 
-    return { ...data, password: '' } as User;
+    const userProfile = { ...data, password: '' } as User;
+    // Store in cache for 15 minutes
+    cacheService.set(cacheKey, userProfile);
+    
+    return userProfile;
   },
 
   updateUserPassword: async (newPassword: string): Promise<boolean> => {

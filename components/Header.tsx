@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth_new';
 import { useLanguage } from '../hooks/useLanguage';
 import { LogoutIcon, EditIcon, LanguageIcon } from './icons';
 import ChangePasswordModal from './ChangePasswordModal';
