@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { useLanguage } from '../hooks/useLanguage';
 import { Logo } from './Logo';
 import { WarningIcon, CopyIcon, LogoutIcon } from './icons';
@@ -107,4 +107,4 @@ USING (auth.uid() = id);
     );
 };
 
-export default DbErrorScreen;
+export default memo(DbErrorScreen);
