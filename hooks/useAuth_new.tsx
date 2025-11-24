@@ -34,21 +34,31 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           return;
       }
 
-      // Added retry logic for session retrieval with limited attempts
-      const maxRetries = 3;
+      // Added retry logic with timeout for session retrieval
+      const maxRetries = 2; // Reduced retries
       let attempt = 0;
       let sessionResult: { data: { session: any }, error: any } | null = null;
 
+      // Set a timeout for the entire authentication process
+      const authTimeout = new Promise<{ data: { session: any }, error: any }>((_, reject) => {
+        setTimeout(() => reject(new Error('Authentication timeout')), 5000); // 5 seconds max
+      });
+
       while (attempt < maxRetries) {
         try {
-          sessionResult = await supabase.auth.getSession();
+          const sessionPromise = supabase.auth.getSession();
+          sessionResult = await Promise.race([sessionPromise, authTimeout]) as { data: { session: any }, error: any };
           if (!sessionResult.error) break; // Exit loop if call was successful
         } catch (e) {
           console.warn(`Session retrieval attempt ${attempt + 1} failed`, e);
+          // If it's a timeout error, don't retry
+          if (e instanceof Error && e.message === 'Authentication timeout') {
+            break;
+          }
         }
         attempt++;
-        // Wait delay before retrying
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Reduced wait delay before retrying
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
 
       if (!sessionResult) {

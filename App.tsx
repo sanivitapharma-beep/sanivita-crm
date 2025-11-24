@@ -1,20 +1,22 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense, lazy } from 'react';
 import { Routes, Route, useNavigate, Navigate, useLocation } from 'react-router-dom';
 import { useAuth, AuthProvider } from './hooks/useAuth_new';
-import Login from './components/Login';
-import ManagerDashboard from './components/ManagerDashboard';
-import RepDashboard from './components/RepDashboard';
 import { UserRole } from './types';
 import { Header } from './components/Header';
 import { useLanguage } from './hooks/useLanguage';
 import Spinner from './components/Spinner';
-import ResetPassword from './components/ResetPassword';
-import DbErrorScreen from './components/DbErrorScreen';
 import { supabase } from './services/supabaseClient';
 
+// Lazy load components to improve initial loading time
+const Login = lazy(() => import('./components/Login'));
+const ManagerDashboard = lazy(() => import('./components/ManagerDashboard'));
+const RepDashboard = lazy(() => import('./components/RepDashboard'));
+const ResetPassword = lazy(() => import('./components/ResetPassword'));
+const DbErrorScreen = lazy(() => import('./components/DbErrorScreen'));
+
 // A wrapper for routes that require authentication
-const ProtectedRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
+const ProtectedRoute = React.memo<{ children: React.ReactElement }>(({ children }) => {
   const { user, loading, authError } = useAuth();
   const location = useLocation();
   const { dir } = useLanguage();
@@ -28,14 +30,18 @@ const ProtectedRoute: React.FC<{ children: React.ReactElement }> = ({ children }
   }
 
   if (authError) {
-    return <DbErrorScreen error={authError} />;
+    return (
+      <Suspense fallback={<div className="min-h-screen bg-[#3a3358] flex items-center justify-center"><Spinner /></div>}>
+        <DbErrorScreen error={authError} />
+      </Suspense>
+    );
   }
 
   return user ? children : <Navigate to="/login" state={{ from: location }} replace />;
 };
 
 // A wrapper for the login page to handle redirection if a user is already logged in
-const PublicRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
+const PublicRoute = React.memo<{ children: React.ReactElement }>(({ children }) => {
    const { user, loading } = useAuth();
    if (loading) {
        return (
@@ -48,7 +54,7 @@ const PublicRoute: React.FC<{ children: React.ReactElement }> = ({ children }) =
 }
 
 // The main dashboard content, shown when a user is authenticated
-const Dashboard: React.FC = () => {
+const Dashboard = React.memo(() => {
   const { user } = useAuth(); // We know user is not null here due to ProtectedRoute
   const { dir } = useLanguage();
   
@@ -58,14 +64,16 @@ const Dashboard: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-sky-100 via-violet-100 to-amber-100 text-slate-800 animate-fade-in" dir={dir}>
       <Header />
       <main className="p-4 md:p-8">
-        {user.role === UserRole.Manager || user.role === UserRole.Supervisor ? <ManagerDashboard /> : <RepDashboard />}
+        <Suspense fallback={<div className="flex items-center justify-center"><Spinner /></div>}>
+          {user.role === UserRole.Manager || user.role === UserRole.Supervisor ? <ManagerDashboard /> : <RepDashboard />}
+        </Suspense>
       </main>
     </div>
   );
 };
 
 // Component to manage routing logic and side-effects
-const AppRoutes: React.FC = () => {
+const AppRoutes = React.memo(() => {
     const { dir } = useLanguage();
     const navigate = useNavigate();
 
@@ -90,7 +98,9 @@ const AppRoutes: React.FC = () => {
                 element={
                     <PublicRoute>
                         <div className="min-h-screen bg-[#3a3358] text-slate-100" dir={dir}>
-                            <Login />
+                            <Suspense fallback={<div className="flex items-center justify-center h-full"><Spinner /></div>}>
+                                <Login />
+                            </Suspense>
                         </div>
                     </PublicRoute>
                 } 
@@ -99,7 +109,9 @@ const AppRoutes: React.FC = () => {
                 path="/reset-password" 
                 element={
                     <div className="min-h-screen bg-[#3a3358] text-slate-100" dir={dir}>
-                        <ResetPassword onSuccess={() => navigate('/login', { replace: true })} />
+                        <Suspense fallback={<div className="flex items-center justify-center h-full"><Spinner /></div>}>
+                            <ResetPassword onSuccess={() => navigate('/login', { replace: true })} />
+                        </Suspense>
                     </div>
                 } 
             />
@@ -118,7 +130,7 @@ const AppRoutes: React.FC = () => {
 }
 
 // The main App component, now simplified to provide auth context directly
-const App: React.FC = () => {
+const App = React.memo(() => {
   return (
     <AuthProvider>
         <AppRoutes />
