@@ -118,9 +118,22 @@ export const api = {
   // --- USER MANAGEMENT (MANAGER) ---
 
   getUsers: async (): Promise<User[]> => {
+    // Check cache first
+    const cachedUsers = cacheService.get<User[]>(CacheKeys.USERS);
+
+    if (cachedUsers) {
+      return cachedUsers;
+    }
+
     const { data, error } = await supabase.from('profiles').select('*');
     if (error) handleSupabaseError(error, 'getUsers');
-    return (data || []).map(u => ({ ...u, password: '' }));
+
+    const users = (data || []).map(u => ({ ...u, password: '' }));
+
+    // Store in cache for 15 minutes
+    cacheService.set(CacheKeys.USERS, users);
+
+    return users;
   },
 
   addUser: async (userData: Omit<User, 'id'> & { password: string }): Promise<User> => {
@@ -194,6 +207,9 @@ export const api = {
       handleSupabaseError(profileError, 'addUser (profile update)');
     }
 
+    // Clear users cache after adding new user
+    cacheService.remove(CacheKeys.USERS);
+
     return { ...profileData, password: '' };
   },
 
@@ -220,6 +236,10 @@ export const api = {
       return null;
     }
 
+    // Clear users cache and specific user profile cache after updating
+    cacheService.remove(CacheKeys.USERS);
+    cacheService.remove(CacheKeys.USER_PROFILE(userId));
+
     return data ? { ...data, password: '' } : null;
   },
 
@@ -239,6 +259,11 @@ export const api = {
       console.error("Failed to delete user with admin privileges:", error.message);
       throw new Error('error_permission_denied_delete_user'); // Custom error for UI
     }
+
+    // Clear users cache and specific user profile cache after deleting
+    cacheService.remove(CacheKeys.USERS);
+    cacheService.remove(CacheKeys.USER_PROFILE(userId));
+
     return true;
   },
 

@@ -16,7 +16,7 @@ const ResetPassword = lazy(() => import('./components/ResetPassword'));
 const DbErrorScreen = lazy(() => import('./components/DbErrorScreen'));
 
 // A wrapper for routes that require authentication
-const ProtectedRoute = React.memo<{ children: React.ReactElement }>(({ children }) => {
+const ProtectedRoute = React.memo(({ children }: { children: React.ReactElement }) => {
   const { user, loading, authError } = useAuth();
   const location = useLocation();
   const { dir } = useLanguage();
@@ -38,7 +38,7 @@ const ProtectedRoute = React.memo<{ children: React.ReactElement }>(({ children 
   }
 
   return user ? children : <Navigate to="/login" state={{ from: location }} replace />;
-};
+});
 
 // A wrapper for the login page to handle redirection if a user is already logged in
 const PublicRoute = React.memo<{ children: React.ReactElement }>(({ children }) => {
@@ -51,7 +51,7 @@ const PublicRoute = React.memo<{ children: React.ReactElement }>(({ children }) 
        );
    }
    return user ? <Navigate to="/" replace /> : children;
-}
+});
 
 // The main dashboard content, shown when a user is authenticated
 const Dashboard = React.memo(() => {
