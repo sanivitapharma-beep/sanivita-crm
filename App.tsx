@@ -70,7 +70,7 @@ const Dashboard = React.memo(() => {
       </main>
     </div>
   );
-};
+});
 
 // Component to manage routing logic and side-effects
 const AppRoutes = React.memo(() => {
