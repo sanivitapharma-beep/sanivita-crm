@@ -127,7 +127,7 @@ const AppRoutes = React.memo(() => {
             <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
     );
-}
+});
 
 // The main App component, now simplified to provide auth context directly
 const App = React.memo(() => {
