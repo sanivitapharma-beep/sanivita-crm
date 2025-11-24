@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useLanguage } from '../hooks/useLanguage';
 import { Logo } from './Logo';
 import { WarningIcon, CopyIcon, LogoutIcon } from './icons';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth_new';
 
 interface DbErrorScreenProps {
     error: string;

@@ -1,7 +1,7 @@
 
 import React, { useEffect } from 'react';
 import { Routes, Route, useNavigate, Navigate, useLocation } from 'react-router-dom';
-import { useAuth, AuthProvider } from './hooks/useAuth';
+import { useAuth, AuthProvider } from './hooks/useAuth_new';
 import Login from './components/Login';
 import ManagerDashboard from './components/ManagerDashboard';
 import RepDashboard from './components/RepDashboard';

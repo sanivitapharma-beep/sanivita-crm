@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../hooks/useAuth_new';
 import { useLanguage } from '../hooks/useLanguage';
 import { EyeIcon, EyeOffIcon, WarningIcon } from './icons';
 import { Logo } from './Logo';
